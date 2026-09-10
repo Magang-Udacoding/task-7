@@ -29,6 +29,7 @@
         <env name="DB_DATABASE" value="test_laravel"/>
         <env name="DB_USERNAME" value="test_laravel"/>
         <env name="DB_PASSWORD" value="password123"/>
+        <env name="DB_SEARCH_PATH" value="test_task7"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
