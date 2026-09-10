@@ -5,13 +5,10 @@
 
 ## What I've Done
 - All methods
+- Melindungi seluruh endpoint Task dengan middleware Sanctum(auth:sanctum).
 
 ## What I've *not* Done
-- Melindungi seluruh endpoint Task dengan middleware Sanctum(auth:sanctum).
-- Melakukan negative testing akses tanpa token.
-- Melakukan final code review dan clean up.
-- Memberikan final checklist keseluruhan project.
+
 
 ## Links
-- Article Medium [Medium Task 3](https://medium.com/@hylmikhalil/kenapa-vanilla-ada-di-dunia-programming-deb993924597).
-- Article Medium [Medium Task 4](https://medium.com/@hylmikhalil/i-prefer-to-use-fastfetch-instead-neofetch-why-2a9e12e95c45).
+- Article Medium [Medium Task 7](https://medium.com/@hylmikhalil/what-actually-happens-when-you-click-create-task-8add25a6833a).
