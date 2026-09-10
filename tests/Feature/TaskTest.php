@@ -2,17 +2,36 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-
 use App\Models\Task;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class TaskTest extends TestCase
 {
-    public function test_can_get_all_tasks(): void
+    use RefreshDatabase;
+
+    /**
+     * Create and return an authenticated user for testing.
+     */
+    private function authenticatedUser(): User
+    {
+        return User::factory()->create();
+    }
+
+    public function test_unauthenticated_user_cannot_access_tasks(): void
     {
         $response = $this->getJson('/api/tasks');
+
+        $response->assertStatus(401);
+    }
+
+    public function test_can_get_all_tasks(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->getJson('/api/tasks');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -23,12 +42,13 @@ class TaskTest extends TestCase
 
     public function test_can_create_task_successfully(): void
     {
-        $payload = [
-            'title' => 'Belajar Laravel',
-            'description' => 'Mempelajari CRUD API',
-        ];
+        $user = $this->authenticatedUser();
 
-        $response = $this->postJson('/api/tasks', $payload);
+        $response = $this->actingAs($user, 'sanctum')
+            ->postJson('/api/tasks', [
+                'title' => 'Belajar Laravel',
+                'description' => 'Mempelajari CRUD API',
+            ]);
 
         $response->assertStatus(201)
             ->assertJson([
@@ -47,9 +67,12 @@ class TaskTest extends TestCase
 
     public function test_create_task_fails_when_title_is_missing(): void
     {
-        $response = $this->postJson('/api/tasks', [
-            'description' => 'Tanpa judul',
-        ]);
+        $user = $this->authenticatedUser();
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->postJson('/api/tasks', [
+                'description' => 'Tanpa judul',
+            ]);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['title']);
@@ -57,15 +80,18 @@ class TaskTest extends TestCase
 
     public function test_can_update_task_successfully(): void
     {
+        $user = $this->authenticatedUser();
+
         $task = Task::create([
             'title' => 'Judul Lama',
             'description' => 'Deskripsi Lama',
         ]);
 
-        $response = $this->putJson("/api/tasks/{$task->id}", [
-            'title' => 'Judul Baru',
-            'is_completed' => true,
-        ]);
+        $response = $this->actingAs($user, 'sanctum')
+            ->putJson("/api/tasks/{$task->id}", [
+                'title' => 'Judul Baru',
+                'is_completed' => true,
+            ]);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -79,9 +105,12 @@ class TaskTest extends TestCase
 
     public function test_update_task_returns_404_when_not_found(): void
     {
-        $response = $this->putJson('/api/tasks/9999', [
-            'title' => 'Tidak Ada',
-        ]);
+        $user = $this->authenticatedUser();
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->putJson('/api/tasks/9999', [
+                'title' => 'Tidak Ada',
+            ]);
 
         $response->assertStatus(404)
             ->assertJson([
@@ -91,11 +120,14 @@ class TaskTest extends TestCase
 
     public function test_can_delete_task_successfully(): void
     {
+        $user = $this->authenticatedUser();
+
         $task = Task::create([
             'title' => 'Task yang akan dihapus',
         ]);
 
-        $response = $this->deleteJson("/api/tasks/{$task->id}");
+        $response = $this->actingAs($user, 'sanctum')
+            ->deleteJson("/api/tasks/{$task->id}");
 
         $response->assertStatus(200)
             ->assertJson([
@@ -109,7 +141,10 @@ class TaskTest extends TestCase
 
     public function test_delete_task_returns_404_when_not_found(): void
     {
-        $response = $this->deleteJson('/api/tasks/9999');
+        $user = $this->authenticatedUser();
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->deleteJson('/api/tasks/9999');
 
         $response->assertStatus(404)
             ->assertJson([
@@ -117,3 +152,4 @@ class TaskTest extends TestCase
             ]);
     }
 }
+
