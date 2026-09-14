@@ -22,6 +22,25 @@ class TaskController extends Controller
         );
     }
 
+    // get task by id
+    public function show(string $id): JsonResponse
+    {
+        $task = Task::find($id);
+
+        if (!$task) {
+            return response()->json([
+                'message' => 'ID tidak ditemukan',
+            ], 404
+            );
+        }
+
+        return response()->json([
+            'message' => 'Task retrieved successfully',
+            'data' => $task,
+        ], 200
+        );
+    }
+
     // create task
     public function store(StoreTaskRequest $request): JsonResponse
     {
